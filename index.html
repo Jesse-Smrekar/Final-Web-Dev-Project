@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>St. Paul Crime</title>
+    <link rel="stylesheet" href="css/style.css"/>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+	<!-- Leaflet (MAP) -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+   <!-- JQuery & Vue -->
+    <script type="application/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+   <script type="application/javascript" src="scripts/script.js"></script>
+ 
+<style>
+
+#app{
+	height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    position: fixed;
+}
+
+
+#searchBlock{
+	width: 100%;
+	height: 100px;
+	background-color: #1d2a2b;
+	padding-top: 2%;
+	padding-bottom: 2%;
+	opacity: 0.9;
+	font-size: 2em;	
+	z-index: 10;
+	margin: 0 auto;
+}
+
+#map{
+	padding-top: 20%;
+	height: 600px;
+	width: 80%;
+}
+
+
+</style>
+</head>
+
+
+<body onload="Init()">
+    <div id="app">
+	
+		<div class="container" id="searchBlock">
+
+
+			<div class="row">
+				<input id="search" class="col-xs-12 col-m-6 col-xl-8" type="text" v-model="location_search" :placeholder="search_placeholder"></input>
+				<select id="type" class="col-xs-12 col-m-3 col-xl-2" v-model="search_type">
+					<option v-for="option in search_type_options" :value="option.value">{{ option.text }}</option>
+				</select>
+				<button type="button" class="col-xs-12 col-m-3 col-xl-2" @click="LocationSearch">Search</button>
+			</div>
+			<div class="row"><br/></div>
+		
+			<div class="row">
+				<div class="col-xl-2">LEFT</div>
+				<div id="map" class="col-xl-8" v-model="map"></div>
+				<div class="col-xl-2">RIGHT</div>
+			</div>
+			
+		</div>
+    </div>
+	
+	
+	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+</body>
+
+  
+
+</html>
