@@ -15,8 +15,8 @@ function Init(crime_api_url) {
         el: "#app",
         data: {
             location_search: "",
-						map: mymap,
-						search_type: "address",
+			map: mymap,
+			search_type: "address",
             search_type_options: [
                 { value: "address", text: "Address" },
                 { value: "coordinate", text: "Coordinate" }
@@ -25,9 +25,12 @@ function Init(crime_api_url) {
         },
         computed: {
             search_placeholder: function() {
+				//var mapCenter = map.getCenter().toString();
+	
                 if (this.search_type[0] === "a")
-                    return "Search for an " + this.search_type;
-                return "Search for a " + this.search_type;
+                    return "Search for an Address: 1234 Street";
+                return "Search for uh coordinate"; //mapCenter.substring( mapCenter.indexOf('(') + 1, mapCenter.length - 1);	
+
             }
         }
     });
@@ -37,6 +40,8 @@ function Init(crime_api_url) {
 		L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXNsYW5kaWRlYWxpc3QiLCJhIjoiY2szdzVhMHhtMGVpMDNrcGVtM3I3dTR1NCJ9.TB0u05RvP7KUzTvyumY4XA', {
 			maxZoom: 18,
 			minZoom: 12,
+			scrollWheelZoom: true,
+			touchZoom: 'center',
 			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -50,6 +55,8 @@ function Init(crime_api_url) {
 		mymap.on('drag', function() {
 		    mymap.panInsideBounds(bounds, { animate: false });
 		});
+		
+		
 }
 
 function Prompt() {
@@ -77,19 +84,27 @@ function Prompt() {
 
 function LocationSearch(event)
 {
-		var input = app.location_search;
+	var input = app.location_search;
+	
+	if( app.search_type == "address"){
+		let result = 'street=' + app.location_search + '&city=Saint+Paul&format=json';
+		getLocation(result);
+	}
+	else{
+		let lat = app.location_search.split(' ')[0];
+		let lon = app.location_search.split(' ')[1];
+		displayCoordinates( [{"lat": lat, "lon": lon}] );
+	}
 
-
-    getLocation();
 }
 
-function getLocation(){
+function getLocation(requestString){
 
-		var requestString = "street=2115+Summit&city=Saint+Paul&format=json";
 		let request = {
 				url: "https://nominatim.openstreetmap.org/search?" + requestString,
 				dataType: "json",
-				success: displayCoordinates
+				success: displayCoordinates,
+				error: function(){ alert('Invalid Address');}
 		};
 
 		$.ajax(request);
@@ -98,7 +113,7 @@ function getLocation(){
 
 function displayCoordinates(data){
 
-		mymap.setView([data[0].lat, data[0].lon], 13);
+		mymap.setView([data[0].lat, data[0].lon], 16);
 		L.marker([data[0].lat, data[0].lon]).addTo(mymap);
 
 
