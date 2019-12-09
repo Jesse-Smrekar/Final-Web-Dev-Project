@@ -13,20 +13,28 @@
    crossorigin=""/>
    <!-- JQuery & Vue -->
     <script type="application/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="application/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
    <script type="application/javascript" src="scripts/script.js"></script>
- 
+
 <style>
 
 #app{
 	height: 100%;
-    width: 100%;
-    left: 0;
-    top: 0;
-    overflow: hidden;
-    position: fixed;
+  width: 100%;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  position: fixed;
 }
-
+#overlay{
+  background-color: black;
+  opacity: 0.85;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 1;
+}
 
 #searchBlock{
 	width: 100%;
@@ -35,7 +43,7 @@
 	padding-top: 2%;
 	padding-bottom: 2%;
 	opacity: 0.9;
-	font-size: 2em;	
+	font-size: 2em;
 	z-index: 10;
 	margin: 0 auto;
 }
@@ -51,9 +59,17 @@
 </head>
 
 
-<body onload="Init()">
+<body onload="Prompt()">
     <div id="app">
-	
+      <div id="overlay" ></div>
+
+        <!-- Prompt -->
+        <div class="dialog-form">
+            <label for="name" style="color: white;font-size:2em;">URL for St. Paul Crime API:</label>
+            <input type="text" id="prompt_input" class="text ui-widget-content ui-corner-all" style="width: 320px;"/>
+        </div>
+        <!-- End: Prompt -->
+
 		<div class="container" id="searchBlock">
 
 
@@ -65,22 +81,27 @@
 				<button type="button" class="col-xs-12 col-m-3 col-xl-2" @click="LocationSearch">Search</button>
 			</div>
 			<div class="row"><br/></div>
-		
+
 			<div class="row">
-				<div class="col-xl-2">LEFT</div>
+		<!--		<div class="col-xl-2">LEFT</div> -->
 				<div id="map" class="col-xl-8" v-model="map"></div>
-				<div class="col-xl-2">RIGHT</div>
+				<div class="col-xl-4">
+          <p style="text-align:center"> NEED HELP?... here's a quick tutorial! </p>
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
+          </div>
+        </div>
 			</div>
-			
-		</div>
+
     </div>
-	
-	
+
+
 	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
    crossorigin=""></script>
 </body>
+        </div>
 
-  
+
 
 </html>
