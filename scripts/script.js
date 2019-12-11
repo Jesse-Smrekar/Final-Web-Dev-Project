@@ -48,17 +48,11 @@ function Init(crime_api_url) {
                 { value: "address", text: "Address" },
                 { value: "coordinate", text: "Coordinate" }
             ],
-            search_results: []
+            search_results: [],
+			search_placeholder: "Search Here"
         },
         computed: {
-            search_placeholder: function() {
-				//var mapCenter = map.getCenter().toString();
-
-                if (this.search_type[0] === "a")
-                    return "Search for an Address: 1234 Street";
-                return "Search for uh coordinate"; //mapCenter.substring( mapCenter.indexOf('(') + 1, mapCenter.length - 1);
-
-            }
+            
         }
     });
 
@@ -67,8 +61,7 @@ function Init(crime_api_url) {
 
 }
 
-
-
+	
 
 
 
@@ -163,62 +156,98 @@ function populateRows(data){
 function createMap(){
 
 
-			mymap = L.map('map').setView([44.954179, -93.091797], 10);
+	mymap = L.map('map').setView([44.954179, -93.091797], 12);
 
-			L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXNsYW5kaWRlYWxpc3QiLCJhIjoiY2szdzVhMHhtMGVpMDNrcGVtM3I3dTR1NCJ9.TB0u05RvP7KUzTvyumY4XA', {
-				maxZoom: 18,
-				minZoom: 12,
-				scrollWheelZoom: true,
-				touchZoom: 'center',
-				attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-					'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-					'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-				id: 'mapbox/streets-v11'
-			}).addTo(mymap);
+	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXNsYW5kaWRlYWxpc3QiLCJhIjoiY2szdzVhMHhtMGVpMDNrcGVtM3I3dTR1NCJ9.TB0u05RvP7KUzTvyumY4XA', {
+		maxZoom: 18,
+		minZoom: 12,
+		scrollWheelZoom: true,
+		touchZoom: 'center',
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox/streets-v11'
+	}).addTo(mymap);
 
-			var northWest = L.latLng(45.002773, -93.218671), southEast = L.latLng(44.883764, -92.991386);
-			var bounds = L.latLngBounds(northWest, southEast);
+	var northWest = L.latLng(45.002773, -93.218671), southEast = L.latLng(44.883764, -92.991386);
+	var bounds = L.latLngBounds(northWest, southEast);
 
-			mymap.setMaxBounds(bounds);
-			mymap.on('drag', function() {
-			    mymap.panInsideBounds(bounds, { animate: false });
-			});
+	mymap.setMaxBounds(bounds);
+	mymap.on('drag', function() {
+		mymap.panInsideBounds(bounds, { animate: false });
+	});
+	
+	mymap.on('moveend', ()=>{	
+	
+		var center = mymap.getCenter().toString();
+		var latlon = { 
+			'lat': center.substring(center.indexOf('(') + 1, center.indexOf(',')),
+			'lon': center.substring(center.indexOf(',') + 2, center.length - 1)
+		};
+		
+		if (app.search_type[0] === "a"){
+			
+			let request = {
+				url: 'https://nominatim.openstreetmap.org/reverse.php?format=json&lat=' + latlon.lat + '&lon=' + latlon.lon,
+				headers: { "Accept": "application/json"},			
+				success: (data)=>{
+					if( data.address.house_number !== undefined){
+						var address = data.address.house_number + ' ' + data.address.road;
+						app.search_placeholder = address;
+						//alert(address);
+					}
+					
+				},
+				error: function(){ alert('Could Not Get Address of Center of Map (200)');}
+			};
 
-			for(var i=0; i< neighborhoods.length; i++){
-				L.marker([neighborhoods[i].lat, neighborhoods[i].lon]).bindTooltip(neighborhoods[i].hood, { permanent: false, direction: 'top'}).addTo(mymap);
-			}
+			$.ajax(request);
+		}
+		
+		else{
+			app.search_placeholder = latlon.lat + ', ' + latlon.lon;
+			//alert(app.search_placeholder);
+		}
+	
+	});
 
-			var polygon = L.polygon(
-	    [[[90, -180],
-	      [90, 180],
-	      [-90, 180],
-	      [-90, -180]], //outer ring
-	     [[44.988094, -93.207611],
-	      [44.953294, -93.207336],
-		  [44.949769, -93.202168],
-		  [44.918002, -93.201342], //Frd Prkwy Bridge
-		 [44.900303, -93.193946],
-		 [44.895029, -93.187198],
-		 [44.894234, -93.169502],
-		 [44.905180, -93.145114],
-		 [44.919723, -93.128577], //West Seventh Corner
-		 [44.919764, -93.096051],
-		 [44.923644, -93.096029],
-		 [44.923573, -93.091014],
-		 [44.919685, -93.090924],
-		 [44.918921, -93.050867],//Battle Creek Corner
-		 [44.901276, -93.038764],
-		 [44.895682, -93.026061],
-		 [44.891048, -93.022994],
-		 [44.891052, -93.004513],
-		 [44.992155, -93.005119],
-		 [44.991802, -93.156665],
-		 [44.988258, -93.156659],
-		 [44.988174, -93.166981],
-		 [44.977335, -93.167115],
-		 [44.977036, -93.187278],
-		 [44.988080, -93.187184] ]] // cutout
-	    ).setStyle({fillColor:"#334652", fillOpacity: 0.7}).addTo(mymap);
+	for(var i=0; i< neighborhoods.length; i++){
+		L.marker([neighborhoods[i].lat, neighborhoods[i].lon]).bindTooltip(neighborhoods[i].hood, { permanent: false, direction: 'top'}).addTo(mymap);
+	}
+
+		var polygon = L.polygon(
+	[[[90, -180],
+	  [90, 180],
+	  [-90, 180],
+	  [-90, -180]], //outer ring
+	 [[44.988094, -93.207611],
+	[44.953294, -93.207336],
+	[44.949769, -93.202168],
+	[44.918002, -93.201342], //Frd Prkwy Bridge
+	[44.900303, -93.193946],
+	[44.895029, -93.187198],
+	[44.894234, -93.169502],
+	[44.905180, -93.145114],
+	[44.919723, -93.128577], //West Seventh Corner
+	[44.919764, -93.096051],
+	[44.923644, -93.096029],
+	[44.923573, -93.091014],
+	[44.919685, -93.090924],
+	[44.918921, -93.050867],//Battle Creek Corner
+	[44.901276, -93.038764],
+	[44.895682, -93.026061],
+	[44.891048, -93.022994],
+	[44.891052, -93.004513],
+	[44.992155, -93.005119],
+	[44.991802, -93.156665],
+	[44.988258, -93.156659],
+	[44.988174, -93.166981],
+	[44.977335, -93.167115],
+	[44.977036, -93.187278],
+	[44.988080, -93.187184] ]] // cutout
+	).setStyle({fillColor:"#334652", fillOpacity: 0.7}).addTo(mymap);
+	
+	
 
 }
 
