@@ -2,6 +2,24 @@ var app;
 var mymap;
 var auth_data = {};
 var API_URL;
+var neighborhoods = [
+	{"hood": "Battle Creek", "lat": 44.944011, "lon": -93.025156},
+	{"hood": "Como", "lat": 44.977532, "lon": -93.146414},
+	{"hood": "Daytons Bluff", "lat": 44.955243, "lon": -93.060887},
+	{"hood": "Downtown", "lat": 44.951651, "lon": -93.090852},
+	{"hood": "Frogtown", "lat": 44.960185, "lon": -93.121615},
+	{"hood": "Greater Eastside", "lat": 44.977719, "lon": -93.025242},
+	{"hood": "Highland Park", "lat": 44.912641, "lon": -93.177235},
+	{"hood": "Macalenser-Groveland", "lat": 44.934347, "lon": -93.173582},
+	{"hood": "Midway", "lat": 44.963015, "lon": -93.167065},
+	{"hood": "Payne-Phalen", "lat": 44.977719, "lon": -93.066038},
+	{"hood": "Riverview", "lat": 44.933023, "lon": -93.090391},
+	{"hood": "St. Anthony Park", "lat": 44.972392, "lon": -93.198394},
+	{"hood": "Summit Hill", "lat": 44.939679, "lon": -93.136448},
+	{"hood": "Summit-University", "lat": 44.950433, "lon": -93.126360},
+	{"hood": "West Seventh", "lat": 44.927815, "lon": -93.126994}
+];
+
 
 //NODE COMMAND: static-server -p 8001
 
@@ -54,6 +72,10 @@ function Init(crime_api_url) {
 		mymap.on('drag', function() {
 		    mymap.panInsideBounds(bounds, { animate: false });
 		});
+		
+		for(var i=0; i< neighborhoods.length; i++){
+			L.marker([neighborhoods[i].lat, neighborhoods[i].lon]).bindTooltip(neighborhoods[i].hood, { permanent: false, direction: 'top'}).addTo(mymap);			
+		}
 		
 		
 }
@@ -139,3 +161,5 @@ Battle Creek: 44.944011, -93.025156
 
 
 */
+
+
