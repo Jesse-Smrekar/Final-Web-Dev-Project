@@ -5,7 +5,6 @@ var API_URL;
 
 //NODE COMMAND: static-server -p 8001
 
-
 function Init(crime_api_url) {
 
 	console.log(crime_api_url);
@@ -35,7 +34,7 @@ function Init(crime_api_url) {
         }
     });
 
-		mymap = L.map('map').setView([44.954179, -93.091797], 15);
+		mymap = L.map('map').setView([44.954179, -93.091797], 2);
 
 		L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXNsYW5kaWRlYWxpc3QiLCJhIjoiY2szdzVhMHhtMGVpMDNrcGVtM3I3dTR1NCJ9.TB0u05RvP7KUzTvyumY4XA', {
 			maxZoom: 18,
@@ -80,8 +79,6 @@ function Prompt() {
 		});
 }
 
-
-
 function LocationSearch(event)
 {
 	var input = app.location_search;
@@ -100,21 +97,20 @@ function LocationSearch(event)
 
 function getLocation(requestString){
 
-		let request = {
-				url: "https://nominatim.openstreetmap.org/search?" + requestString,
-				dataType: "json",
-				success: displayCoordinates,
-				error: function(){ alert('Invalid Address');}
-		};
+	let request = {
+			url: "https://nominatim.openstreetmap.org/search?" + requestString,
+			dataType: "json",
+			success: displayCoordinates,
+			error: function(){ alert('Invalid Address');}
+	};
 
-		$.ajax(request);
+	$.ajax(request);
 
 }
 
 function displayCoordinates(data){
 
-		mymap.setView([data[0].lat, data[0].lon], 16);
-		L.marker([data[0].lat, data[0].lon]).addTo(mymap);
-
+	mymap.setView([data[0].lat, data[0].lon], 16);
+	L.marker([data[0].lat, data[0].lon]).addTo(mymap);
 
 }
