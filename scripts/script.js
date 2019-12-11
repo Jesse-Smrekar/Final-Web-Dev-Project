@@ -47,7 +47,7 @@ function Init(crime_api_url) {
 			id: 'mapbox/streets-v11'
 		}).addTo(mymap);
 
-		var northWest = L.latLng(45.063676, -93.218506), southEast = L.latLng(44.825053, -92.949209);
+		var northWest = L.latLng(45.002773, -93.218671), southEast = L.latLng(44.883764, -92.991386);
 		var bounds = L.latLngBounds(northWest, southEast);
 
 		mymap.setMaxBounds(bounds);
@@ -114,3 +114,28 @@ function displayCoordinates(data){
 	L.marker([data[0].lat, data[0].lon]).addTo(mymap);
 
 }
+
+
+/* Neighborhoods
+
+
+
+
+Highland Park: 44.912641, -93.177235
+Macalenser-Groveland: 44.934347, -93.173582
+West Seventh: 44.927815, -93.126994
+Riverview: 44.933023, -93.090391
+Daytons Bluff: 44.955243, -93.060887
+Greater Eastside: 44.975379, -93.025242
+Payne-Phalen: 44.977719, -93.066038
+Summit-University: 44.950433, -93.126360
+Frogtown: 44.960185, -93.121615
+Downtown: 44.951651, -93.090852
+St. Anthony Park: 44.972392, -93.198394
+Como: 44.977532, -93.146414
+Summit Hill: 44.939679, -93.136448
+Midway: 44.963015, -93.167065
+Battle Creek: 44.944011, -93.025156
+
+
+*/
