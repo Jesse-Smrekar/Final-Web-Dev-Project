@@ -93,14 +93,36 @@
         </div>
 			</div>
 
-    </div>
+
 
 
 	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
    crossorigin=""></script>
+
+   <div class="row">
+   	<table class="col-xs-12 col-m-12 col-xl-12">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Neighborhood Name</th>
+          <th>Incident Type</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr v-model="rows" v-for="row in rows">
+        <td>{{row.date}}</td>
+        <td>{{row.time}}</td>
+        <td>{{row.neighborhood_number}}</td>
+        <td>{{row.code}}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
 </body>
-        </div>
+</div>
+  </div>
 
 
 
