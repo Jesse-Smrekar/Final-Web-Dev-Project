@@ -119,12 +119,21 @@ function getLocation(requestString){
 }
 
 function displayCoordinates(data){
+	var redIcon = new L.Icon({
+	  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+	  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+	  iconSize: [25, 41],
+	  iconAnchor: [12, 41],
+	  popupAnchor: [1, -34],
+	  shadowSize: [41, 41]
+	});
 
 	mymap.setView([data[0].lat, data[0].lon], 16);
-	L.marker([data[0].lat, data[0].lon]).addTo(mymap);
+	L.marker([data[0].lat, data[0].lon], {icon: redIcon}).bindTooltip(app.location_search, { permanent: false, direction: 'top'}).addTo(mymap);	
 
+	app.search_placeholder = app.location_search;
+	app.location_search = '';
 }
-
 
 
 function getCrimeData(){
