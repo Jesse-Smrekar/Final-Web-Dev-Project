@@ -10,7 +10,7 @@ var neighborhoods = [
 	{"hood": "Frogtown", "lat": 44.960185, "lon": -93.121615},
 	{"hood": "Greater Eastside", "lat": 44.977719, "lon": -93.025242},
 	{"hood": "Highland Park", "lat": 44.912641, "lon": -93.177235},
-	{"hood": "Macalenser-Groveland", "lat": 44.934347, "lon": -93.173582},
+	{"hood": "Macalester-Groveland", "lat": 44.934347, "lon": -93.173582},
 	{"hood": "Midway", "lat": 44.963015, "lon": -93.167065},
 	{"hood": "Payne-Phalen", "lat": 44.977719, "lon": -93.066038},
 	{"hood": "Riverview", "lat": 44.933023, "lon": -93.090391},
@@ -33,6 +33,7 @@ var neighborhoods = [
 //NODE COMMAND: static-server -p 8001
 
 function Init(crime_api_url) {
+	getCrimeData();
 
 	console.log(crime_api_url);
 	  API_URL = crime_api_url;
@@ -40,9 +41,10 @@ function Init(crime_api_url) {
     app = new Vue({
         el: "#app",
         data: {
-						rows: {},
-            location_search: "",
+				rows: {},
+        location_search: "",
 			map: mymap,
+			crime: 0,
 			search_type: "address",
             search_type_options: [
                 { value: "address", text: "Address" },
@@ -52,16 +54,16 @@ function Init(crime_api_url) {
 			search_placeholder: "Search Here"
         },
         computed: {
-            
+
         }
     });
 
 		createMap();
-		getCrimeData();
+
 
 }
 
-	
+
 
 
 
@@ -119,49 +121,60 @@ function getLocation(requestString){
 }
 
 function displayCoordinates(data){
-	var redIcon = new L.Icon({
-	  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-	  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-	  iconSize: [25, 41],
-	  iconAnchor: [12, 41],
-	  popupAnchor: [1, -34],
-	  shadowSize: [41, 41]
-	});
 
-	mymap.setView([data[0].lat, data[0].lon], 16);
-	L.marker([data[0].lat, data[0].lon], {icon: redIcon}).bindTooltip(app.location_search, { permanent: false, direction: 'top'}).addTo(mymap);	
+	if(app.crime == 1){
+		var redIcon = new L.Icon({
+		  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+		  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+		  iconSize: [25, 41],
+		  iconAnchor: [12, 41],
+		  popupAnchor: [1, -34],
+		  shadowSize: [41, 41]
+		});
 
+		mymap.setView([data[0].lat, data[0].lon], 16);
+		L.marker([data[0].lat, data[0].lon], {icon: redIcon}).bindTooltip(app.location_search, { permanent: false, direction: 'top'}).addTo(mymap);
+	}
+	else{
+		var greenIcon = new L.Icon({
+			iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+			shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+
+		mymap.setView([data[0].lat, data[0].lon], 16);
+		L.marker([data[0].lat, data[0].lon], {icon: greenIcon}).bindTooltip(app.location_search, { permanent: false, direction: 'top'}).addTo(mymap);
+
+	}
 	app.search_placeholder = app.location_search;
 	app.location_search = '';
+	app.crime = 0;
 }
 
 
 function getCrimeData(){
 
 	let request = {
-			url: 'http://cisc-dean.stthomas.edu:8002/incidents?format=json&limit=10',
+			url: 'http://cisc-dean.stthomas.edu:8002/incidents?format=json&start_date=2019-10-01&end_date=2019-10-31',
 			headers: { "Accept": "application/json"},
 			//url: API_URL + '/incidents?format=json',//"https://cisc-dean.stthomas.edu:" + port,
 			dataType: "json",
-			type: 'GET',
-			crossDomain: true,
-      beforeSend: function(xhr){
-          xhr.withCredentials = true;
-    	},
-			success: populateRows,
-			error: function(){ alert('Could Not Get St.Paul Crime Data');}
+			success: function(data){
+				app.rows = data;
+			},
+			error: ()=>{ alert('Could Not Get St.Paul Crime Data');}
 	};
 
 	$.ajax(request);
 }
-
+/*
 function populateRows(data){
 
-	alert(JSON.stringify(data));
-	app.rows = data;
-
 }
-
+*/
 function createMap(){
 
 
@@ -185,39 +198,39 @@ function createMap(){
 	mymap.on('drag', function() {
 		mymap.panInsideBounds(bounds, { animate: false });
 	});
-	
-	mymap.on('moveend', ()=>{	
-	
+
+	mymap.on('moveend', ()=>{
+
 		var center = mymap.getCenter().toString();
-		var latlon = { 
+		var latlon = {
 			'lat': center.substring(center.indexOf('(') + 1, center.indexOf(',')),
 			'lon': center.substring(center.indexOf(',') + 2, center.length - 1)
 		};
-		
+
 		if (app.search_type[0] === "a"){
-			
+
 			let request = {
 				url: 'https://nominatim.openstreetmap.org/reverse.php?format=json&lat=' + latlon.lat + '&lon=' + latlon.lon,
-				headers: { "Accept": "application/json"},			
+				headers: { "Accept": "application/json"},
 				success: (data)=>{
 					if( data.address.house_number !== undefined){
 						var address = data.address.house_number + ' ' + data.address.road;
 						app.search_placeholder = address;
 						//alert(address);
 					}
-					
+
 				},
 				error: function(){ alert('Could Not Get Address of Center of Map (200)');}
 			};
 
 			$.ajax(request);
 		}
-		
+
 		else{
 			app.search_placeholder = latlon.lat + ', ' + latlon.lon;
 			//alert(app.search_placeholder);
 		}
-	
+
 	});
 
 	for(var i=0; i< neighborhoods.length; i++){
@@ -255,8 +268,8 @@ function createMap(){
 	[44.977036, -93.187278],
 	[44.988080, -93.187184] ]] // cutout
 	).setStyle({fillColor:"#334652", fillOpacity: 0.7}).addTo(mymap);
-	
-	
+
+
 
 }
 
