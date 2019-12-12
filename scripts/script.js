@@ -2,22 +2,26 @@ var app;
 var mymap;
 var auth_data = {};
 var API_URL;
+var still_loading = 1;
 var neighborhoods = [
-	{"hood": "Battle Creek", "lat": 44.944011, "lon": -93.025156},
-	{"hood": "Como", "lat": 44.977532, "lon": -93.146414},
-	{"hood": "Daytons Bluff", "lat": 44.955243, "lon": -93.060887},
-	{"hood": "Downtown", "lat": 44.951651, "lon": -93.090852},
-	{"hood": "Frogtown", "lat": 44.960185, "lon": -93.121615},
-	{"hood": "Greater Eastside", "lat": 44.977719, "lon": -93.025242},
-	{"hood": "Highland Park", "lat": 44.912641, "lon": -93.177235},
-	{"hood": "Macalester-Groveland", "lat": 44.934347, "lon": -93.173582},
-	{"hood": "Midway", "lat": 44.963015, "lon": -93.167065},
-	{"hood": "Payne-Phalen", "lat": 44.977719, "lon": -93.066038},
-	{"hood": "Riverview", "lat": 44.933023, "lon": -93.090391},
-	{"hood": "St. Anthony Park", "lat": 44.972392, "lon": -93.198394},
-	{"hood": "Summit Hill", "lat": 44.939679, "lon": -93.136448},
-	{"hood": "Summit-University", "lat": 44.950433, "lon": -93.126360},
-	{"hood": "West Seventh", "lat": 44.927815, "lon": -93.126994}
+	{"hood": "Conway/Battle Creek/Highwood", "lat": 44.944011, "lon": -93.025156, "crimes": 0},
+	{"hood": "Greater Eastside", "lat": 44.977719, "lon": -93.025242, "crimes": 0},
+	{"hood": "Westside", "lat": 44.931543, "lon": -93.078075, "crimes": 0},
+	{"hood": "Daytons Bluff", "lat": 44.955243, "lon": -93.060887, "crimes": 0},
+	{"hood": "Payne-Phalen", "lat": 44.977719, "lon": -93.066038, "crimes": 0},
+	{"hood": "North End", "lat": 44.978012, "lon": -93.108909, "crimes": 0},
+	{"hood": "Frogtown", "lat": 44.960185, "lon": -93.121615, "crimes": 0},
+	{"hood": "Summit-University", "lat": 44.950433, "lon": -93.126360, "crimes": 0},
+	{"hood": "West Seventh", "lat": 44.927815, "lon": -93.126994, "crimes": 0},
+	{"hood": "Como", "lat": 44.977532, "lon": -93.146414, "crimes": 0},
+	{"hood": "Midway", "lat": 44.963015, "lon": -93.167065, "crimes": 0},
+	{"hood": "St. Anthony", "lat": 44.972392, "lon": -93.198394, "crimes": 0},
+	{"hood": "Union Park", "lat": 44.949043, "lon": -93.177145, "crimes": 0},
+	{"hood": "Macalester-Groveland", "lat": 44.934347, "lon": -93.173582, "crimes": 0},
+	{"hood": "Highland Park", "lat": 44.912641, "lon": -93.177235, "crimes": 0},
+	{"hood": "Summit Hill", "lat": 44.939679, "lon": -93.136448, "crimes": 0},
+	{"hood": "Summit Hill", "lat": 44.948767, "lon": -93.092090, "crimes": 0}
+	//{"hood": "Downtown", "lat": 44.951651, "lon": -93.090852},
 ];
 
 
@@ -36,7 +40,7 @@ function Init(crime_api_url) {
 	getCrimeData();
 
 	console.log(crime_api_url);
-	  API_URL = crime_api_url;
+	API_URL = crime_api_url;
 
     app = new Vue({
         el: "#app",
@@ -45,6 +49,8 @@ function Init(crime_api_url) {
         location_search: "",
 			map: mymap,
 			crime: 0,
+			rows: {},
+			still_loading: 1,
 			search_type: "address",
             search_type_options: [
                 { value: "address", text: "Address" },
@@ -58,8 +64,18 @@ function Init(crime_api_url) {
         }
     });
 
-		createMap();
 
+	createMap();
+	/*let wait = new Promise( (resolve, reject)=>{
+		
+		resolve(createMap());
+		
+	}).then( ()=>{
+			
+		document.getElementById("overlay").parentNode.removeChild(document.getElementById("overlay"));
+		
+	});
+	*/
 
 }
 
@@ -80,7 +96,13 @@ function Prompt() {
 								var prompt_input = $("#prompt_input");
 								Init(prompt_input.val());
 								$(this).dialog("close");
-							document.getElementById("overlay").parentNode.removeChild(document.getElementById("overlay"));//.dialog("close");
+								var div = document.getElementById("overlay");
+								div.style.color = "white";
+								div.innerHTML = "Loading...";
+								div.style.position = "fixed";
+								div.style.textAlign = "center";
+								div.style.fontSize = "5em";
+								div.style.paddingTop = "300px";
 
 						},
 						"Cancel": function() {
@@ -170,13 +192,8 @@ function getCrimeData(){
 
 	$.ajax(request);
 }
-/*
-function populateRows(data){
 
-}
-*/
 function createMap(){
-
 
 	mymap = L.map('map').setView([44.954179, -93.091797], 12);
 
@@ -268,28 +285,12 @@ function createMap(){
 	[44.977036, -93.187278],
 	[44.988080, -93.187184] ]] // cutout
 	).setStyle({fillColor:"#334652", fillOpacity: 0.7}).addTo(mymap);
-
-
+	
 
 }
 
-/* Neighborhoods
-
-Highland Park: [44.912641, -93.177235]
-Macalenser-Groveland: [44.934347, -93.173582]
-West Seventh: 44.927815, -93.126994
-Riverview: 44.933023, -93.090391
-Daytons Bluff: 44.955243, -93.060887
-Greater Eastside: 44.975379, -93.025242
-Payne-Phalen: 44.977719, -93.066038
-Summit-University: 44.950433, -93.126360
-Frogtown: 44.960185, -93.121615
-Downtown: 44.951651, -93.090852
-St. Anthony Park: 44.972392, -93.198394
-Como: 44.977532, -93.146414
-Summit Hill: 44.939679, -93.136448
-Midway: 44.963015, -93.167065
-Battle Creek: 44.944011, -93.025156
-
-
-*/
+function clear(){
+	
+	document.getElementById("overlay").parentNode.removeChild(document.getElementById("overlay"));
+	
+}
