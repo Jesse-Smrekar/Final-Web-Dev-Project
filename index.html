@@ -50,8 +50,11 @@
 
 #map{
 	padding-top: 20%;
-	height: 600px;
-	width: 80%;
+	//margin-left: 10px;
+	//margin-right: 10px;
+	height: 640px;
+	width: 80%;border: 7px solid black;
+	border-radius: 5px;
 }
 
 #crimes{
@@ -60,14 +63,20 @@
   display: block;
 }
 
+
 table{
 	background-color: white;
 	width: 100%
+	height: 100px;
 
 }
 body {
 	width: 100%;
   overflow: auto;
+}
+.container{
+	width: 100%;
+
 }
 
 
@@ -87,54 +96,98 @@ body {
         </div>
         <!-- End: Prompt -->
 
-		<div class="container" id="searchBlock">
+		<div class="container-fluid no-padding" id="searchBlock">
 
 
-			<div class="row">
-				<input id="search" class="col-xs-12 col-m-6 col-xl-8" type="text" v-model="location_search" :placeholder="search_placeholder"></input>
+			<div class="row justify-content-center">
+				<input id="search" class="col-xs-12 col-m-6 col-xl-6" type="text" v-model="location_search" :placeholder="search_placeholder"></input>
 				<select id="type" class="col-xs-12 col-m-3 col-xl-2" v-model="search_type">
 					<option v-for="option in search_type_options" :value="option.value">{{ option.text }}</option>
 				</select>
 				<button type="button" class="col-xs-12 col-m-3 col-xl-2" @click="LocationSearch">Search</button>
+				<button type="button" class="col-xs-12 col-m-3 col-xl-1" @click="filter">Apply Filter</button>
 			</div>
 			<div class="row"><br/></div>
 
 			<div class="row">
 		<!--		<div class="col-xl-2">LEFT</div> -->
-				<div id="map" class="col-xl-8" v-model="map" ></div>
-				<div class="col-xl-4">
-          <p style="text-align:center"> NEED HELP?... here's a quick tutorial! </p>
-          <div class="embed-responsive embed-responsive-16by9">
-            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/zpOULjyy-n8?rel=0" allowfullscreen></iframe>
-          </div>
-          <div >  <!--insert filters here -->
-
-            peepee poopoo
-
-          </div>
-        </div>
+				<div id="map" class="col-xl-8" v-model="map" >
+				</div>
+				<div id="right-side" class="col-xl-4">
+					<div class="row">	
+						<div  class="col-xl-6">
+							<span> DATE START: </span>
+							<input v-model="start_date" class="form-control" id="date" name="date" placeholder="YYYY-MM-DD" type="text">
+						</div>
+						<div  class="col-xl-6">
+							<span> DATE END: </span>
+							<input v-model="end_date"class="form-control" id="date" name="date" placeholder="YYYY-MM-DD" type="text">
+						</div>
+					</div>
+					<div class="row">	
+						<div  class="col-xl-6">
+							<span> TIME START: </span>
+							<input v-model="start_time" class="form-control" id="date" name="date" placeholder="24 hours:60 mins" type="text">
+						</div>
+						<div  class="col-xl-6">
+							<span> TIME END: </span>
+							<input v-model="end_time" class="form-control" id="date" name="date" placeholder="24 hours:60 mins" type="text">
+						</div>
+					</div>
+					<div class="row">	
+					<span> INCIDENT TYPES </span><br>
+					</div>
+					<div class="row" style="font-size=0.25em;">	
+						<div  class="col-xl-12">
+							<form >
+								<input v-model="crime_filter" type="checkbox" name="Violent Crimes" value="violent">Violent Crimes
+								<input v-model="crime_filter" type="checkbox" name="Property Damage" value="prop">Property Damage
+								<input v-model="crime_filter" type="checkbox" name="Other" value="other">Other
+							</form>
+						</div>
+					</div>
+					<div class="row" style="border-top: 5px solid black">	
+						<span> NEIGHBORHOODS </span><br>
+					</div>
+					<div class="row" style="height: 100px; overflow-y: scroll;border-bottom: 5px solid black">	
+						<div  class="col-xl-12">
+						 <form>
+							<ul style="list-style:none;">
+								<li v-for="hood in neighborhoods">
+								<input v-model="hood_filter" type="checkbox" id="{{hood.hood}}" :value="hood.hood" style="font-size: 20em;">
+								<label for="{{hood.hood}}" >{{hood.hood}}</label>
+								</li>
+							</ul>
+							</form>
+						</div>
+					</div>
+					
+					<div class="row">	
+						<div id="crimes">
+							<table class="table table-bordered table-striped">
+							  <thead>
+								<tr>
+								  <th>Date</th>
+								  <th>Time</th>
+								  <th>Neighborhood Name</th>
+								  <th>Incident Type</th>
+								</tr>
+							  </thead>
+							  <tbody>
+								<tr v-model="rows" v-for="row in rows" @click="app.incident=row; app.location_search=row.block; app.crime=1; LocationSearch();" :style="app.colors[row.code]">
+								  <td>{{row.date}}</td>
+								  <td>{{row.time}}</td>
+								  <td>{{app.neighborhoods[row.neighborhood_number-1].hood}}</td>
+								  <td>{{row.code}}</td>
+								</tr>
+							  </tbody>
+							</table>
+						</div>
+					</div>
+				</div>
 			</div>
 
-	   <div id="crimes">
-		<table class="table table-bordered table-striped">
-		  <thead>
-			<tr>
-			  <th>Date</th>
-			  <th>Time</th>
-			  <th>Neighborhood Name</th>
-			  <th>Incident Type</th>
-			</tr>
-		  </thead>
-		  <tbody>
-			<tr v-model="rows" v-for="row in rows" @click="app.curr_incident=row; app.location_search=row.block; app.crime=1; LocationSearch();" :style="app.colors[row.code]">
-			  <td>{{row.date}}</td>
-			  <td>{{row.time}}</td>
-			  <td>{{app.neighborhoods[row.neighborhood_number-1].hood}}</td>
-			  <td>{{row.code}}</td>
-			</tr>
-		  </tbody>
-	  </table>
-	  </div>
+	   
 	  
 	  </div>
   </div>

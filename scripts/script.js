@@ -1,3 +1,5 @@
+//NODE COMMAND: static-server -p 8001
+
 var app;
 var mymap;
 var auth_data = {};
@@ -20,8 +22,27 @@ var neighborhoods = [
 	{"hood": "Macalester-Groveland", "lat": 44.934347, "lon": -93.173582, "crimes": 0},
 	{"hood": "Highland Park", "lat": 44.912641, "lon": -93.177235, "crimes": 0},
 	{"hood": "Summit Hill", "lat": 44.939679, "lon": -93.136448, "crimes": 0},
-	{"hood": "Summit Hill", "lat": 44.948767, "lon": -93.092090, "crimes": 0}
+	{"hood": "Capitol River", "lat": 44.948767, "lon": -93.092090, "crimes": 0}
 ];
+
+neighbor_num = [
+"Conway/Battle Creek/Highwood",
+"Greater Eastside",
+"Westside",
+"Daytons Bluff",
+"Payne-Phalen",
+"North End",
+"Frogtown",
+"Summit-University",
+"West Seventh",
+"Como",
+"Midway",
+"St. Anthony",
+"Union Park", 
+"Macalester-Groveland",
+"Highland Park",
+"Summit Hill",
+]
 
 var color_list = {
   "110": "background-color:red; color: white;", ////////
@@ -206,18 +227,6 @@ var color_list = {
   "9959": "background-color:blue; color:white;"
 };
 
-
-
-
-
-
-
-
-
-
-
-//NODE COMMAND: static-server -p 8001
-
 function Init(crime_api_url) {
 	getCrimeData();
 
@@ -230,10 +239,17 @@ function Init(crime_api_url) {
 			rows: {},
 			location_search: "",
 			colors: color_list,
+			incident: {},
 			neighborhoods: neighborhoods,
 			map: mymap,
 			crime: 0,
 			rows: {},
+			hood_filter: [],
+			crime_filter: [],
+			start_date: '2019-10-01',
+			end_date: '2019-10-31',
+			start_time: '00:00:0000',
+			end_time:'24:59:9999',
 			still_loading: 1,
 			search_type: "address",
             search_type_options: [
@@ -263,13 +279,6 @@ function Init(crime_api_url) {
 
 }
 
-
-
-
-
-
-
-
 function Prompt() {
 		$(".dialog-form").dialog({
 				autoOpen: true,
@@ -282,7 +291,7 @@ function Prompt() {
 								Init(prompt_input.val());
 								$(this).dialog("close");
 								var div = document.getElementById("overlay");
-								div.style.fontcolor = "white";
+								div.style.fontColor = "white";
 								div.innerHTML = "Loading...";
 								div.style.position = "fixed";
 								div.style.textAlign = "center";
@@ -298,8 +307,7 @@ function Prompt() {
 		});
 }
 
-function LocationSearch(event)
-{
+function LocationSearch(event){
 	var input = app.location_search;
 
 	if( app.search_type == "address"){
@@ -340,7 +348,24 @@ function displayCoordinates(data){
 		});
 
 		mymap.setView([data[0].lat, data[0].lon], 16);
-		L.marker([data[0].lat, data[0].lon], {icon: redIcon}).bindTooltip(app.location_search, { permanent: false, direction: 'top'}).addTo(mymap);
+		var marker = L.marker([data[0].lat, data[0].lon], {icon: redIcon});
+		var tooltip = L.tooltip({
+			direction: 'top',
+			permanent: false,
+			interactive: true,
+			opacity: 0.9,
+		});
+		tooltip.setContent( app.incident.date +', '+app.incident.time +'\n '+app.incident.incident+' -Click to delete!');
+		tooltip.setLatLng(new L.LatLng(data[0].lat, data[0].lon));
+		tooltip.on('click', function(event) {
+			alert("Click!");
+		});
+		marker.on('click', ()=>{ map.removeLayer(marker);} );
+		marker.bindTooltip(tooltip).addTo(mymap);
+		
+		
+		//L.marker([data[0].lat, data[0].lon], {icon: redIcon}).bindTooltip(app.location_search, { permanent: false, direction: 'top'}).addTo(mymap);
+		//L.marker([data[0].lat, data[0].lon], {icon: redIcon}).bindTooltip(app.location_search, { permanent: false, direction: 'top'}).addTo(mymap);
 	}
 	else{
 		var greenIcon = new L.Icon({
@@ -361,7 +386,6 @@ function displayCoordinates(data){
 	app.crime = 0;
 }
 
-
 function getCrimeData(){
 
 	let request = {
@@ -380,7 +404,7 @@ function getCrimeData(){
 
 function createMap(){
 
-	mymap = L.map('map').setView([44.954179, -93.091797], 12);
+	mymap = L.map('map').setView([44.954179, -93.091797], 13);
 
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXNsYW5kaWRlYWxpc3QiLCJhIjoiY2szdzVhMHhtMGVpMDNrcGVtM3I3dTR1NCJ9.TB0u05RvP7KUzTvyumY4XA', {
 		maxZoom: 18,
@@ -477,5 +501,43 @@ function createMap(){
 function clear(){
 	
 	document.getElementById("overlay").parentNode.removeChild(document.getElementById("overlay"));
+	
+}
+
+
+function filter(data){
+	
+	let request = {
+			url: 'http://cisc-dean.stthomas.edu:8002/incidents?format=json&start_date='+app.start_date+'&end_date=' + app.end_date,
+			headers: { "Accept": "application/json"},
+			//url: API_URL + '/incidents?format=json',//"https://cisc-dean.stthomas.edu:" + port,
+			dataType: "json",
+			success: function(data){
+				var result = {};
+				
+				for( var incident in data){
+					app.crime_filter.forEach( crime =>{
+						app.hood_filter.forEach( hood =>{
+							
+							if(data[incident].neighborhood_number == neighborhoods
+							
+							
+							
+						}		
+					}
+				}
+			},
+			error: ()=>{ alert('Could Not Get St.Paul Crime Data');}
+	};
+
+	$.ajax(request);
+	
+	
+	
+	
+	alert(app.hood_filter);
+	alert(app.crime_filter);
+	alert(app.start_date +' ' + app.end_date);
+	alert(app.start_time +' ' + app.end_time);
 	
 }
