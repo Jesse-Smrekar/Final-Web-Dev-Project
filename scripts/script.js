@@ -4,7 +4,6 @@ var app;
 var mymap;
 var auth_data = {};
 var API_URL;
-var still_loading = 1;
 var neighborhoods = [
 	{"hood": "Conway/Battle Creek/Highwood", "lat": 44.944011, "lon": -93.025156, "crimes": 0},
 	{"hood": "Greater Eastside", "lat": 44.977719, "lon": -93.025242, "crimes": 0},
@@ -228,10 +227,8 @@ var color_list = {
 };
 
 function Init(crime_api_url) {
-	getCrimeData();
-
-	console.log(crime_api_url);
-	API_URL = crime_api_url;
+		API_URL = crime_api_url;
+		getCrimeData();
 
     app = new Vue({
 			el: "#app",
@@ -248,8 +245,8 @@ function Init(crime_api_url) {
 			crime_filter: [],
 			start_date: '2019-10-01',
 			end_date: '2019-10-31',
-			start_time: '00:00:0000',
-			end_time:'24:59:9999',
+			start_time: '00:00:00.000',
+			end_time:'23:59:59.999',
 			still_loading: 1,
 			search_type: "address",
             search_type_options: [
@@ -266,16 +263,6 @@ function Init(crime_api_url) {
 
 
 	createMap();
-	/*let wait = new Promise( (resolve, reject)=>{
-
-		resolve(createMap());
-
-	}).then( ()=>{
-
-		document.getElementById("overlay").parentNode.removeChild(document.getElementById("overlay"));
-
-	});
-	*/
 
 }
 
@@ -291,17 +278,18 @@ function Prompt() {
 								Init(prompt_input.val());
 								$(this).dialog("close");
 								var div = document.getElementById("overlay");
-							//	div.style.fontColor = "white";
+								div.style.fontColor = "white";
 								div.innerHTML = "Loading...";
 								div.style.position = "fixed";
 								div.style.textAlign = "center";
 								div.style.fontSize = "5em";
 								div.style.paddingTop = "300px";
+							//	alert(div.innerHTML);
 
 						},
 						"Cancel": function() {
 								$(this).dialog("close");
-								document.getElementById("overlay").parentNode.removeChild(document.getElementById("overlay"));//.dialog("close");
+								document.getElementById("overlay").parentNode.removeChild(document.getElementById("overlay"));
 						}
 				}
 		});
@@ -360,15 +348,7 @@ function displayCoordinates(data){
 		});
 		tooltip.setContent( app.incident.date +', '+app.incident.time +'\n '+app.incident.incident+' -Click to delete!');
 		tooltip.setLatLng(new L.LatLng(data[0].lat, data[0].lon));
-		tooltip.on('mouseover', function(event) {
-			alert("PENIS!");
-		});
-		marker.on('click', ()=>{ map.removeLayer(marker);} );
-		marker.bindTooltip(tooltip).addTo(mymap);
-
-
-		//L.marker([data[0].lat, data[0].lon], {icon: redIcon}).bindTooltip(app.location_search, { permanent: false, direction: 'top'}).addTo(mymap);
-		//L.marker([data[0].lat, data[0].lon], {icon: redIcon}).bindTooltip(app.location_search, { permanent: false, direction: 'top'}).addTo(mymap);
+		marker.bindTooltip(tooltip).on('click', function(event){mymap.removeLayer(marker);}).addTo(mymap);
 	}
 	else{
 		var greenIcon = new L.Icon({
@@ -392,9 +372,8 @@ function displayCoordinates(data){
 function getCrimeData(){
 
 	let request = {
-			url: 'http://cisc-dean.stthomas.edu:8002/incidents?format=json&start_date=2019-10-01&end_date=2019-10-31',
 			headers: { "Accept": "application/json"},
-			//url: API_URL + '/incidents?format=json',//"https://cisc-dean.stthomas.edu:" + port,
+			url: API_URL + '/incidents?format=json&start_date=2019-10-01&end_date=2019-10-31',
 			dataType: "json",
 			success: function(data){
 				app.rows = data;
@@ -445,7 +424,6 @@ function createMap(){
 					if( data.address.house_number !== undefined){
 						var address = data.address.house_number + ' ' + data.address.road;
 						app.search_placeholder = address;
-						//alert(address);
 					}
 
 				},
@@ -457,7 +435,6 @@ function createMap(){
 
 		else{
 			app.search_placeholder = latlon.lat + ', ' + latlon.lon;
-			//alert(app.search_placeholder);
 		}
 
 	});
@@ -524,7 +501,6 @@ function filter(data){
 		});
 		hoods = hoods.substring(0, hoods.length - 1);
 		result = result + hoods;
-		alert(result);
 	}
 
 	if(app.crime_filter.length){
@@ -561,26 +537,25 @@ function filter(data){
 		result = result + codes;
 	}
 
-
 	let request = {
 			url: result,
 			headers: { "Accept": "application/json"},
-			//url: API_URL + '/incidents?format=json',//"https://cisc-dean.stthomas.edu:" + port,
 			dataType: "json",
 			success: function(data){
-				app.rows = data;
+				var keep = {};
+
+				for(var inc in data){
+					if(data[inc].time > app.start_time){
+						if(data[inc].time < app.end_time){
+							keep[inc] = data[inc];
+						}
+					}
+				}
+
+				app.rows = keep;
 			},
 			error: ()=>{ alert('Could Not Get St.Paul Crime Data');}
 	};
 
 	$.ajax(request);
-
-
-
-/**
-	alert(app.hood_filter);
-	alert(app.crime_filter);
-	alert(app.start_date +' ' + app.end_date);
-	alert(app.start_time +' ' + app.end_time);
-**/
 }

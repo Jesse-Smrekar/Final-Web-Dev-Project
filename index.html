@@ -30,10 +30,11 @@
 #overlay{
   background-color: black;
   opacity: 0.85;
-  height: 10000px;
-  width: 10000px;
+  height: 100%;
+  width: 100%;
   position: fixed;
-  z-index: 1;
+  color:white;
+  z-index: 10;
 }
 
 #searchBlock{
@@ -87,12 +88,12 @@ body {
 
 <body onload="Prompt()">
     <div id="app">
-      <div id="overlay" <!--v-if="still_loading"--> ></div>
+      <div id="overlay" v-if="still_loading" ></div>
 
         <!-- Prompt -->
         <div class="dialog-form">
-            <label for="name" style="color: white;font-size:2em;">Port for St. Paul Crime API:</label>
-            <input type="text" id="prompt_input" class="text ui-widget-content ui-corner-all" style="width: 320px;" placeholder="cisc-dean.stthomas.edu: &#60;port&#62;"></input>
+            <label for="name" style="color: white;font-size:2em;">URL and Port for St. Paul Crime API:</label>
+            <input type="text" id="prompt_input" class="text ui-widget-content ui-corner-all" style="width: 320px;" value="http://cisc-dean.stthomas.edu:"></input>
         </div>
         <!-- End: Prompt -->
 
@@ -173,7 +174,7 @@ body {
 								</tr>
 							  </thead>
 							  <tbody>
-								<tr v-model="rows" v-for="row in rows" @click="app.incident=row; app.location_search=row.block; app.crime=1; LocationSearch();" :style="app.colors[row.code].style">
+								<tr :onload="app.still_loading=0" v-model="rows" v-for="row in rows" @click="app.incident=row; app.location_search=row.block; app.crime=1; LocationSearch();" :style="app.colors[row.code].style">
 								  <td>{{row.date}}</td>
 								  <td>{{row.time}}</td>
 								  <td>{{app.neighborhoods[row.neighborhood_number-1].hood}}</td>
