@@ -66,7 +66,7 @@
 
 table{
 	background-color: white;
-	width: 100%
+	width: 100px;
 	height: 100px;
 
 }
@@ -114,7 +114,7 @@ body {
 				<div id="map" class="col-xl-8" v-model="map" >
 				</div>
 				<div id="right-side" class="col-xl-4">
-					<div class="row">	
+					<div class="row">
 						<div  class="col-xl-6">
 							<span> DATE START: </span>
 							<input v-model="start_date" class="form-control" id="date" name="date" placeholder="YYYY-MM-DD" type="text">
@@ -124,7 +124,7 @@ body {
 							<input v-model="end_date"class="form-control" id="date" name="date" placeholder="YYYY-MM-DD" type="text">
 						</div>
 					</div>
-					<div class="row">	
+					<div class="row">
 						<div  class="col-xl-6">
 							<span> TIME START: </span>
 							<input v-model="start_time" class="form-control" id="date" name="date" placeholder="24 hours:60 mins" type="text">
@@ -134,22 +134,22 @@ body {
 							<input v-model="end_time" class="form-control" id="date" name="date" placeholder="24 hours:60 mins" type="text">
 						</div>
 					</div>
-					<div class="row">	
+					<div class="row">
 					<span> INCIDENT TYPES </span><br>
 					</div>
-					<div class="row" style="font-size=0.25em;">	
+					<div class="row" style="font-size=0.25em;">
 						<div  class="col-xl-12">
 							<form >
-								<input v-model="crime_filter" type="checkbox" name="Violent Crimes" value="violent">Violent Crimes
-								<input v-model="crime_filter" type="checkbox" name="Property Damage" value="prop">Property Damage
-								<input v-model="crime_filter" type="checkbox" name="Other" value="other">Other
+								<input v-model="crime_filter" type="checkbox" name="Violent Crimes" value="0">Violent Crimes
+								<input v-model="crime_filter" type="checkbox" name="Property Damage" value="1">Property Damage
+								<input v-model="crime_filter" type="checkbox" name="Other" value="2">Other
 							</form>
 						</div>
 					</div>
-					<div class="row" style="border-top: 5px solid black">	
+					<div class="row" style="border-top: 5px solid black">
 						<span> NEIGHBORHOODS </span><br>
 					</div>
-					<div class="row" style="height: 100px; overflow-y: scroll;border-bottom: 5px solid black">	
+					<div class="row" style="height: 100px; overflow-y: scroll;border-bottom: 5px solid black">
 						<div  class="col-xl-12">
 						 <form>
 							<ul style="list-style:none;">
@@ -161,8 +161,7 @@ body {
 							</form>
 						</div>
 					</div>
-					
-					<div class="row">	
+					<div class="row">
 						<div id="crimes">
 							<table class="table table-bordered table-striped">
 							  <thead>
@@ -174,11 +173,11 @@ body {
 								</tr>
 							  </thead>
 							  <tbody>
-								<tr v-model="rows" v-for="row in rows" @click="app.incident=row; app.location_search=row.block; app.crime=1; LocationSearch();" :style="app.colors[row.code]">
+								<tr v-model="rows" v-for="row in rows" @click="app.incident=row; app.location_search=row.block; app.crime=1; LocationSearch();" :style="app.colors[row.code].style">
 								  <td>{{row.date}}</td>
 								  <td>{{row.time}}</td>
 								  <td>{{app.neighborhoods[row.neighborhood_number-1].hood}}</td>
-								  <td>{{row.code}}</td>
+								  <td>{{row.incident}}</td>
 								</tr>
 							  </tbody>
 							</table>
@@ -186,12 +185,9 @@ body {
 					</div>
 				</div>
 			</div>
-
-	   
-	  
 	  </div>
   </div>
-  
+
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
 	   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
 	   crossorigin=""></script>
@@ -201,4 +197,3 @@ body {
 
 
 </html>
-
