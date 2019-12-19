@@ -559,3 +559,10 @@ function filter(data){
 
 	$.ajax(request);
 }
+
+function aboutPage(event){
+
+	document.location.href = path.join(__dirname, 'public', 'AboutPage.html');
+
+
+}

@@ -39,7 +39,7 @@
 
 #searchBlock{
 	width: 100%;
-	height: 100px;
+	height: 150px;
 	background-color: #1d2a2b;
 	padding-top: 2%;
 	padding-bottom: 2%;
@@ -100,14 +100,21 @@ body {
 		<div class="container-fluid no-padding" id="searchBlock">
 
 
-			<div class="row justify-content-center">
+			<div class="row">
 				<input id="search" class="col-xs-12 col-m-6 col-xl-6" type="text" v-model="location_search" :placeholder="search_placeholder"></input>
-				<select id="type" class="col-xs-12 col-m-3 col-xl-2" v-model="search_type">
-					<option v-for="option in search_type_options" :value="option.value">{{ option.text }}</option>
-				</select>
-				<button type="button" class="col-xs-12 col-m-3 col-xl-2" @click="LocationSearch">Search</button>
-				<button type="button" class="col-xs-12 col-m-3 col-xl-1" @click="filter">Apply Filter</button>
+        <div class="col-xl-5"></div>
+				<a class="col-xs-12 col-m-3 col-xl-1 " href="AboutPage.html"><b>ABOUT</b></a>
+
 			</div>
+      <div class="row">
+        <select id="type" class="col-xs-12 col-m-3 col-xl-2" v-model="search_type">
+          <option v-model="search_type" v-for="option in search_type_options" :value="option.value">{{ option.text }}</option>
+        </select>
+        <button type="button" class="col-xs-12 col-m-3 col-xl-2" @click="LocationSearch">Search</button>
+        <div class="col-xl-2"></div>
+        <button type="button" class="col-xs-12 col-m-3 col-xl-1" @click="filter">Apply Filter</button>
+      </div>
+
 			<div class="row"><br/></div>
 
 			<div class="row">
